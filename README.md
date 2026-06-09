@@ -40,8 +40,9 @@ More in [docs/02-mental-model.md](docs/02-mental-model.md).
 
 ```
 docs/          Narrative guide — decide, mental model, setup, patterns, deploy
-examples/      Worked migration (SharePoint end-to-end)
-.claude/       Skills and slash commands (convert-action-pack)
+examples/      Worked migration (SharePoint end-to-end) +
+               agent-server-example (platform-features reference)
+.claude/       Skills — analyze-agent-zip (plan), convert-action-pack (migrate)
 ```
 
 ## Contributing

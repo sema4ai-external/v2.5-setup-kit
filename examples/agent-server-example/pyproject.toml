@@ -1,0 +1,18 @@
+[project]
+name = "mcp-agent-server-example"
+version = "0.1.0"
+description = "Reference MCP server for Sema4.ai platform features — invocation context, thread dataframes, and thread files."
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.3",
+    "httpx",
+    "sema4ai-api-client",
+]
+
+[dependency-groups]
+test = [
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

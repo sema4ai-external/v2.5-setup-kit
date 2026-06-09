@@ -7,6 +7,10 @@ see the [`convert-action-pack`](../.claude/skills/convert-action-pack/SKILL.md)
 skill (sections 9.1–9.5) and the
 [worked SharePoint migration](../examples/worked-migration/).
 
+For a focused, runnable reference of these three points on their own —
+context, thread dataframes, and thread files as six small tools — see the
+[agent-server-example](../examples/agent-server-example/).
+
 ## Context: `X-Tool-Invocation-Context`
 
 One base64-encoded JSON header carries every piece of platform context
