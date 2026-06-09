@@ -1,0 +1,23 @@
+# Postgres data connection for the agent_feedback database.
+#
+# The same database the feedback MCP writes to. The reporter agent only READS it
+# (the verified queries below are all SELECTs). The connection name
+# `agent-feedback-neon` is referenced by `data_connection_name` in sdm.yml.
+#
+# Supply your own Postgres via environment variables (do NOT commit real values):
+#   FEEDBACK_PG_HOST     your-postgres-host.example.com
+#   FEEDBACK_PG_PORT     5432
+#   FEEDBACK_PG_DATABASE agent_feedback
+#   FEEDBACK_PG_USER     feedback_user
+#   FEEDBACK_PG_PASSWORD <your password>  (do NOT commit the real value)
+
+data_connection:
+  engine: postgres
+  name: agent-feedback-neon
+  description: Postgres database of agent thumbs up/down feedback
+  host: ${FEEDBACK_PG_HOST:-your-postgres-host.example.com}
+  port: ${FEEDBACK_PG_PORT:-5432}
+  database: ${FEEDBACK_PG_DATABASE:-agent_feedback}
+  user: ${FEEDBACK_PG_USER:-feedback_user}
+  password: ${FEEDBACK_PG_PASSWORD}
+  schema: public

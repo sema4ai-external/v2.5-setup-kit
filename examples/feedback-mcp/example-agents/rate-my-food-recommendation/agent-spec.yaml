@@ -1,0 +1,44 @@
+agent-package:
+  spec-version: v2
+  agents:
+  - name: Rate My Food Recommendation
+    description: Demo agent that recommends food for a place, tells a joke, and collects a thumbs up/down via the Feedback MCP.
+    model:
+      provider: OpenAI
+      name: gpt-4o
+    version: 1.0.0
+    architecture: agent_platform.architectures.experimental_1
+    reasoning: disabled
+    runbook: runbook.md
+    action-packages: []
+    knowledge: []
+    semantic-data-models:
+    - name: Agent Feedback Insights.yaml
+    mcp-servers:
+    - name: Feedback Tools
+      transport: streamable-http
+      url: https://<your-feedback-mcp-host>/mcp
+      headers:
+        X-Sema4ai-Auth: '<your-auth-token>'
+      force-serial-tool-calls: false
+    conversation-starter: ''
+    document-intelligence: v2.1
+    welcome-message: Name a place - or drop an image or file related to a place - and I'll recommend food for it. I'll also ask how you liked my sense of humor.
+    metadata:
+      mode: conversational
+    selected-tools:
+      tools: []
+    agent-settings:
+      max_iterations: 40
+      conversation_turns_kept_in_context: 30
+  exclude:
+  - ./.git/**
+  - ./.vscode/**
+  - ./devdata/**
+  - ./output/**
+  - ./venv/**
+  - ./.venv/**
+  - ./**/.env
+  - ./**/.DS_Store
+  - ./**/*.pyc
+  - ./*.zip
