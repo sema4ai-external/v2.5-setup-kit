@@ -167,7 +167,7 @@ migrated agent needs, consolidated across all packs:
   - **Deployment note**: when a pack uses data connections, both the **MCP
     server** *and* the **data connection** must exist — the MCP runs as a
     remote server, but the data connection is created in the product UI with
-    the exact **connection name** the pack's SQL expects (e.g. `ITP_DEV`).
+    the exact **connection name** the pack's SQL expects (e.g. `ANALYTICS_DW`).
     Forgetting this is a common blocker.
 - **External endpoints** — any `external-endpoints` hosts that must be
   reachable / allow-listed.
