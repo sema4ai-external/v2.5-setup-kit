@@ -1,7 +1,6 @@
-# Sema4.ai Actions to MCPs
+# v2.5 Setup Kit
 
-Migration guide and tooling for moving Sema4.ai custom actions to remote MCP
-servers.
+Complete migration guide, templates, and tooling for moving Sema4.ai custom actions to remote MCP servers and setting up production infrastructure.
 
 > **Sema4.ai only supports remote MCPs.** Stdio MCPs are fine for local
 > development (Claude Desktop, Cursor), but every MCP registered with a
