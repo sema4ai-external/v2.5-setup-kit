@@ -82,6 +82,14 @@ Every pattern should support an env-var fallback for local dev so
 `python server.py` + MCP Inspector works without the agent in the loop.
 Document the env-var names in your MCP's README.
 
+**Forwarded bearer assumes a user is present.** It fits a *conversational*
+agent. A *worker* agent (triggers / schedule, no interactive user at run
+time) can't run the OAuth dance on demand — provision a non-interactive
+credential (a service / long-lived token, or the provider's
+client-credentials flow) and register the MCP with `org_secret` rather than
+`user_oauth`. [`analyze-agent-zip`](../.claude/skills/analyze-agent-zip/SKILL.md)
+flags this from the agent's run model.
+
 ### OAuth scope consolidation
 
 The biggest quiet shift from actions to MCP.

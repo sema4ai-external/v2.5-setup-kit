@@ -37,6 +37,13 @@ The export is a zip. Unpack it to a temp directory and map the contents:
 - **Runbook(s) / agent spec** — capture the agent name and a one-line note
   on what it does. You don't migrate the runbook; you migrate the packs it
   depends on.
+- **Run model** — is this a **conversational** agent (a user is present and
+  drives it in chat) or a **worker** agent (autonomous — runs on triggers,
+  a schedule, an inbound mailbox/channel, or a runbook that executes
+  unattended)? Signals in the runbook/spec: triggers, a schedule, mailbox or
+  channel inputs, "runs unattended" → worker; otherwise conversational. This
+  decides which MCP auth mode the customer should configure (§7) — it is the
+  single most-missed requirement for OAuth packs on worker agents.
 - **Action packs** — each directory containing a `package.yaml` is one
   pack. A single export commonly bundles several. List them all before
   analyzing any — a pack missed here is a capability silently dropped.
@@ -139,6 +146,19 @@ migrated agent needs, consolidated across all packs:
   **scopes**, and whether any scope needs **admin consent** (call these out
   — e.g. Microsoft Teams scopes are admin-only). MCP servers register the
   OAuth client once with the **union** of scopes across the pack's tools.
+- **MCP auth mode** — how the customer registers each migrated MCP with the
+  agent: `none` / `org_secret` / `user_oauth`. **This depends on the run
+  model from §2, not just the pack's auth shape:**
+  - **API-key pack** → `org_secret` (the key is held as an org secret and
+    sent as a header), for either run model.
+  - **OAuth pack on a conversational agent** → `user_oauth` — the agent runs
+    the OAuth dance with the user present and forwards the bearer.
+  - **OAuth pack on a worker agent** → `user_oauth` **does not work**: there
+    is no interactive user at run time to authorize. The customer must supply
+    a **non-interactive credential** — a service / long-lived token, or the
+    provider's client-credentials (M2M) flow — registered as `org_secret`.
+    Flag this loudly; it's the requirement customers most often miss.
+  - **No-auth pack** → `none`.
 - **Data connections** — from each `DataSourceSpec`: the **engine**
   (postgres / snowflake / …) and the **connection name**. The customer
   creates this data connection on the agent (the MCP/SDM resolves
@@ -160,8 +180,10 @@ migrated agent needs, consolidated across all packs:
 
 Produce, in one document:
 
-1. The **agent summary** (§2).
-2. A **per-pack decision table**: pack → outcome → one-line reason (§3).
+1. The **agent summary** (§2) — including the **run model** (conversational
+   vs worker), since it drives the auth-mode recommendation.
+2. A **per-pack decision table**: pack → outcome → recommended MCP auth mode
+   (§7) → one-line reason.
 3. The **per-pack inventory tables** (§6).
 4. The **customer-requirements checklist** (§7).
 5. **Parity notes** — anything dropped, merged, or renamed, and why.
