@@ -243,6 +243,13 @@ to build."
 
 Pick one row × column combination per tool, or per server when consistent.
 
+This matrix classifies the *pack's* auth shape. How the customer
+**registers** the resulting MCP with the agent (`none` / `org_secret` /
+`user_oauth`) also depends on the agent's run model — a **worker** agent
+has no interactive user, so it can't use `user_oauth`; an OAuth pack there
+needs a non-interactive credential via `org_secret`. See
+[`analyze-agent-zip`](../analyze-agent-zip/SKILL.md) §2 and §7.
+
 ## 8. Target layout
 
 ```

@@ -9,6 +9,13 @@ to stay in the loop.
 > Before starting, confirm the action should actually migrate. Run the
 > [decision tree](01-decide.md) — SQL-first actions become SDM Verified
 > Queries, not MCPs.
+>
+> Migrating a whole **exported agent** (a `.zip` bundling several packs)
+> rather than a single pack? Run the
+> [`analyze-agent-zip`](../.claude/skills/analyze-agent-zip/SKILL.md) skill
+> first — it unpacks the export, applies the decision tree per pack, and
+> produces a plan plus a customer-requirements checklist. Then run the loop
+> below for each pack that lands on "migrate to MCP".
 
 ## The loop, at a glance
 

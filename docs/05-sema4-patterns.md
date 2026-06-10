@@ -7,6 +7,10 @@ see the [`convert-action-pack`](../.claude/skills/convert-action-pack/SKILL.md)
 skill (sections 9.1–9.5) and the
 [worked SharePoint migration](../examples/worked-migration/).
 
+For a focused, runnable reference of these three points on their own —
+context, thread dataframes, and thread files as six small tools — see the
+[agent-server-example](../examples/agent-server-example/).
+
 ## Context: `X-Tool-Invocation-Context`
 
 One base64-encoded JSON header carries every piece of platform context
@@ -77,6 +81,14 @@ Most migrations land on one of four patterns:
 Every pattern should support an env-var fallback for local dev so
 `python server.py` + MCP Inspector works without the agent in the loop.
 Document the env-var names in your MCP's README.
+
+**Forwarded bearer assumes a user is present.** It fits a *conversational*
+agent. A *worker* agent (triggers / schedule, no interactive user at run
+time) can't run the OAuth dance on demand — provision a non-interactive
+credential (a service / long-lived token, or the provider's
+client-credentials flow) and register the MCP with `org_secret` rather than
+`user_oauth`. [`analyze-agent-zip`](../.claude/skills/analyze-agent-zip/SKILL.md)
+flags this from the agent's run model.
 
 ### OAuth scope consolidation
 
