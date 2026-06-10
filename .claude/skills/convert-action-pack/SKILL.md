@@ -590,6 +590,59 @@ def attach_report(name: str, data: bytes) -> dict:
 | `X-Action-Invocation-Context` header            | `X-Tool-Invocation-Context` (same base64 format)  |
 | Individual `X-Invoked-By-Assistant-Id` etc.     | Parse from `X-Tool-Invocation-Context`            |
 
+### 10.7 Securing the MCP server itself with Entra ID (machine auth + auth code)
+
+Sections 10.1–10.4 cover auth **to upstream APIs**. When the MCP server itself must
+require OAuth2 (Azure AD / Entra ID), use FastMCP's `AzureProvider` — never hand-roll
+JWT validation (Entra publishes ~5 rotating signing keys; the key must be selected by
+the token's `kid`, which the provider does automatically).
+
+**Entra setup**: five non-obvious properties are required; missing any one yields an
+opaque `invalid_token`. Use the tested Bicep template in
+`templates/entra-mcp-server-oauth/` (two-pass deploy, README has CLI quick start +
+troubleshooting table). The five, for reference:
+
+1. `requestedAccessTokenVersion: 2` — else even the v2 endpoint issues v1 tokens
+   (`iss: sts.windows.net/...`) that fail issuer validation
+2. Delegated scope (e.g. `invoke`) → auth-code tokens' `scp` claim
+3. App role (e.g. `invoke.app`) **assigned to the app's own service principal** →
+   client-credentials tokens' `roles` claim (absent without the self-assignment)
+4. Identifier URI in the `api://{client_id}` form (tenant policy rejects vanity names)
+5. Redirect URI `{base_url}/auth/callback`
+
+**Server code** — two adjustments are mandatory for machine auth:
+
+```python
+from fastmcp.server.auth.providers.azure import AzureProvider
+
+class AzureHybridProvider(AzureProvider):
+    """AzureProvider is an OAuth proxy: it issues its own tokens (auth code flow)
+    and by design rejects raw Entra tokens. Also accept direct bearer tokens
+    (client credentials / machine auth)."""
+    async def load_access_token(self, token):
+        return (await super().load_access_token(token)
+                or await self._token_validator.verify_token(token))
+
+auth = AzureHybridProvider(client_id=..., client_secret=..., tenant_id=...,
+                           required_scopes=["invoke"],
+                           base_url=os.environ["PUBLIC_BASE_URL"])
+# CC tokens carry `roles`, never `scp`; FastMCP only reads scope/scp:
+_orig = auth._token_validator._extract_scopes
+auth._token_validator._extract_scopes = lambda c: (
+    _orig(c) or ["invoke" if r == "invoke.app" else r for r in c.get("roles", [])])
+```
+
+**Client config**: machine auth uses scope `api://{client_id}/.default` (named scopes
+are rejected for client credentials with `AADSTS70011`); auth-code clients need only
+the `/mcp` URL — RFC 9728/8414 discovery + DCR are served by FastMCP.
+
+**Validation — the negative test is mandatory**: `POST /mcp` with no credentials must
+return **401** with a `WWW-Authenticate` challenge. An auth test that passes while the
+no-credentials probe returns 200 means auth silently failed to initialize — a false
+positive. Then verify a real client-credentials token completes `initialize`, and that
+`/.well-known/oauth-protected-resource/mcp` resolves. Debug auth **locally** before any
+image build — deploy loops are minutes and blind; local is seconds with full logs.
+
 ## 11. `pyproject.toml`
 
 Base:
