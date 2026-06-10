@@ -186,3 +186,30 @@ shows a no-op `_bind_request_context` stub alongside a monkeypatched
 - **Missing `sema4ai-api-client` in `pyproject.toml`** — the import
   fails at tool-call time, not server startup.
 - **Logging bytes** — filename and size only, never content.
+
+## Data connections (a database with no DB secret)
+
+When a migrated MCP needs a **database**, you don't have to hand it a
+separate DB secret. The same callback token that powers the thread-files
+overlay also authorizes the Agent Server's **data-connections** endpoint —
+so the MCP can read the agent's already-configured data connection at call
+time and build its connection string from that.
+
+The flow, on each tool call:
+
+1. Parse `X-Tool-Invocation-Context` for `agent_server_api_url` +
+   `agent_server_api_token` (same as the thread-files overlay).
+2. `GET` the agent's data connections, pick the one by name (e.g.
+   `agent-feedback-neon`), and read its `configuration`
+   (host / port / database / user / password).
+3. Build the connection string and connect.
+
+Keep an explicit-override order for local dev — a connection-string header,
+then an env var, then the data-connection lookup — so `python server.py`
+works without the agent in the loop. The MCP then needs **no DB secret of
+its own**; the data connection is the single source of truth (and the same
+one a reporting SDM reads).
+
+Worked end to end in the [feedback-mcp example](../examples/feedback-mcp/)
+(`resolve_connection_string` in its `server.py`), which also ships a
+read-only reporting SDM and two agents that consume the MCP.

@@ -1,0 +1,37 @@
+agent-package:
+  spec-version: v2
+  agents:
+  - name: Agent Feedback Analyzer
+    description: Demo agent that reports on collected thumbs up/down feedback via a read-only semantic data model.
+    model:
+      provider: OpenAI
+      name: gpt-4o
+    version: 1.0.0
+    architecture: agent_platform.architectures.experimental_1
+    reasoning: disabled
+    runbook: runbook.md
+    action-packages: []
+    knowledge: []
+    semantic-data-models:
+    - name: Agent Response Feedback.yaml
+    mcp-servers: []
+    conversation-starter: We're going to start you off with an overview of agent feedback, then you can analyze further. Hang tight...
+    document-intelligence: v2.1
+    metadata:
+      mode: conversational
+    selected-tools:
+      tools: []
+    agent-settings:
+      max_iterations: 40
+      conversation_turns_kept_in_context: 30
+  exclude:
+  - ./.git/**
+  - ./.vscode/**
+  - ./devdata/**
+  - ./output/**
+  - ./venv/**
+  - ./.venv/**
+  - ./**/.env
+  - ./**/.DS_Store
+  - ./**/*.pyc
+  - ./*.zip

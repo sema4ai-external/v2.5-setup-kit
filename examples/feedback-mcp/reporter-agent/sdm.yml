@@ -1,0 +1,173 @@
+name: Agent Feedback Analytics
+tables:
+  - name: agent_feedback
+    synonyms:
+      - feedback
+      - thumbs
+      - user_feedback
+    base_table:
+      table: agent_feedback
+      schema: null
+      database: null
+      data_connection_name: agent-feedback-neon
+    dimensions:
+      - expr: id
+        name: id
+        data_type: '!string'
+        description: Surrogate key uniquely identifying a feedback record.
+      - expr: agent_id
+        name: agent_id
+        data_type: string
+        description: The agent that produced the rated suggestion.
+      - expr: user_id
+        name: user_id
+        data_type: string
+        description: The user who gave the feedback (for distinct-user counts).
+      - expr: thread_id
+        name: thread_id
+        data_type: string
+        description: The conversation thread the feedback was given in.
+      - expr: rated_message_id
+        name: rated_message_id
+        data_type: string
+        description: Id of the specific agent message (suggestion) the thumb is about.
+      - expr: thumb_up_or_down
+        name: thumb_up_or_down
+        data_type: string
+        description: The verdict — 'up' or 'down'.
+        is_enum: true
+        sample_values:
+          - up
+          - down
+      - expr: notes
+        name: notes
+        data_type: string
+        description: Optional free-text the user added with their thumb.
+      - expr: rated_agent_message
+        name: rated_agent_message
+        data_type: string
+        description: The specific agent suggestion the thumb is about.
+      - expr: preceding_user_message
+        name: preceding_user_message
+        data_type: string
+        description: What the user sent right before that suggestion.
+    time_dimensions:
+      - expr: created_at
+        name: created_at
+        data_type: timestamp
+        description: When the feedback was recorded.
+
+verified_queries:
+  # Gate-check used by a runbook to block a step until the user has chosen.
+  - name: Last Thumb For Thread Step
+    nlq: Get the most recent thumb (up/down) recorded for a given thread, optionally scoped to a specific rated message id, so a runbook can tell whether the user has given feedback yet for the current step
+    sql: |
+      SELECT thumb_up_or_down, notes, created_at
+      FROM agent_feedback
+      WHERE thread_id = :thread_id
+        AND (:rated_message_id = '' OR rated_message_id = :rated_message_id)
+      ORDER BY created_at DESC
+      LIMIT 1
+    parameters:
+      - name: thread_id
+        data_type: string
+        description: The conversation thread id to check.
+        example_value: "thread-1"
+      - name: rated_message_id
+        data_type: string
+        description: Optional rated agent message id to scope the check to the current step. Pass an empty string to ignore.
+        example_value: ""
+    verified_at: "2026-05-26T00:00:00.000Z"
+    verified_by: feedback-template
+
+  - name: Feedback Counts By Verdict
+    nlq: Count thumbs up versus thumbs down over a recent window
+    sql: |
+      SELECT thumb_up_or_down, COUNT(*) AS feedback_count
+      FROM agent_feedback
+      WHERE created_at >= NOW() - make_interval(days => :days_back)
+      GROUP BY thumb_up_or_down
+      ORDER BY feedback_count DESC
+    parameters:
+      - name: days_back
+        data_type: integer
+        description: How many days back to include.
+        example_value: 7
+    verified_at: "2026-05-26T00:00:00.000Z"
+    verified_by: feedback-template
+
+  - name: Up Rate By Agent
+    nlq: For each agent, the share of feedback that was thumbs up (approval rate)
+    sql: |
+      SELECT
+        agent_id,
+        COUNT(*) AS total_feedback,
+        COUNT(*) FILTER (WHERE thumb_up_or_down = 'up') AS thumbs_up,
+        ROUND(
+          100.0 * COUNT(*) FILTER (WHERE thumb_up_or_down = 'up')
+          / NULLIF(COUNT(*), 0), 1
+        ) AS up_rate_pct
+      FROM agent_feedback
+      WHERE created_at >= NOW() - make_interval(days => :days_back)
+      GROUP BY agent_id
+      ORDER BY total_feedback DESC
+    parameters:
+      - name: days_back
+        data_type: integer
+        description: How many days back to include.
+        example_value: 30
+    verified_at: "2026-05-26T00:00:00.000Z"
+    verified_by: feedback-template
+
+  - name: Recent Thumbs Down With Notes
+    nlq: Show the most recent thumbs-down feedback along with the user's notes and the rated suggestion
+    sql: |
+      SELECT created_at, agent_id, notes, rated_agent_message, preceding_user_message
+      FROM agent_feedback
+      WHERE thumb_up_or_down = 'down'
+      ORDER BY created_at DESC
+      LIMIT :row_limit
+    parameters:
+      - name: row_limit
+        data_type: integer
+        description: Maximum number of rows to return.
+        example_value: 20
+    verified_at: "2026-05-26T00:00:00.000Z"
+    verified_by: feedback-template
+
+  - name: Distinct Users Giving Feedback
+    nlq: How many distinct users gave feedback (and how many total thumbs) over a recent window
+    sql: |
+      SELECT
+        COUNT(DISTINCT user_id) AS distinct_users,
+        COUNT(*) AS total_feedback,
+        COUNT(*) FILTER (WHERE thumb_up_or_down = 'up') AS thumbs_up,
+        COUNT(*) FILTER (WHERE thumb_up_or_down = 'down') AS thumbs_down
+      FROM agent_feedback
+      WHERE created_at >= NOW() - make_interval(days => :days_back)
+    parameters:
+      - name: days_back
+        data_type: integer
+        description: How many days back to include.
+        example_value: 30
+    verified_at: "2026-05-27T00:00:00.000Z"
+    verified_by: feedback-template
+
+  - name: Feedback Volume Over Time
+    nlq: Daily count of thumbs up and thumbs down to see the feedback trend
+    sql: |
+      SELECT
+        DATE_TRUNC('day', created_at) AS day,
+        COUNT(*) FILTER (WHERE thumb_up_or_down = 'up') AS thumbs_up,
+        COUNT(*) FILTER (WHERE thumb_up_or_down = 'down') AS thumbs_down
+      FROM agent_feedback
+      WHERE created_at >= NOW() - make_interval(days => :days_back)
+      GROUP BY 1
+      ORDER BY 1
+    parameters:
+      - name: days_back
+        data_type: integer
+        description: How many days back to include.
+        example_value: 30
+    verified_at: "2026-05-26T00:00:00.000Z"
+    verified_by: feedback-template

@@ -1,0 +1,21 @@
+agent-package:
+  spec-version: v2
+  agents:
+    - name: Feedback Reports
+      description: >-
+        Answers questions and produces simple reports about user thumbs up/down
+        feedback collected on agent suggestions. Reads the agent_feedback Neon
+        database through a semantic data model with verified queries.
+      model:
+        provider: OpenAI
+        name: gpt-4o
+      version: 0.0.1
+      architecture: plan_execute
+      reasoning: enabled
+      runbook: runbook.md
+      semantic-data-models:
+        - name: sdm.yml
+      conversation-starter: 'How much thumbs up vs down did we get this week?'
+      welcome-message: >-
+        Hi — I report on the thumbs up/down feedback users gave on agent
+        suggestions. Ask me about approval rates, trends, or recent thumbs-down notes.
