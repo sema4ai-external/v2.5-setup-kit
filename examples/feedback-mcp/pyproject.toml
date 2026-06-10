@@ -1,0 +1,21 @@
+[project]
+name = "mcp-feedback"
+version = "0.1.0"
+description = "Record user thumbs up/down feedback on agent suggestions into Postgres"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp",
+    "sema4ai-api-client",
+    "httpx>=0.28.0",
+    "psycopg2-binary>=2.9",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"

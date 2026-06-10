@@ -1,7 +1,6 @@
-# Sema4.ai Actions to MCPs
+# v2.5 Setup Kit
 
-Migration guide and tooling for moving Sema4.ai custom actions to remote MCP
-servers.
+Complete migration guide, templates, and tooling for moving Sema4.ai custom actions to remote MCP servers and setting up production infrastructure.
 
 > **Sema4.ai only supports remote MCPs.** Stdio MCPs are fine for local
 > development (Claude Desktop, Cursor), but every MCP registered with a
@@ -41,7 +40,10 @@ More in [docs/02-mental-model.md](docs/02-mental-model.md).
 ```
 docs/          Narrative guide — decide, mental model, setup, patterns, deploy
 examples/      Worked migration (SharePoint end-to-end) +
+               feedback-mcp (data-connection pattern + two consumer agents) +
                agent-server-example (platform-features reference)
+templates/     Reusable infrastructure templates (Bicep, etc.) — M365 OAuth
+               app registration, etc.
 .claude/       Skills — analyze-agent-zip (plan), convert-action-pack (migrate)
 ```
 

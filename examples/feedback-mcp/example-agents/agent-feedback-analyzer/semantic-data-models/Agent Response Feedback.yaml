@@ -1,0 +1,124 @@
+description: This model tracks user feedback on agent responses across conversations,
+  including thumbs up/down ratings, message context, and timing. It helps teams evaluate
+  response quality, identify trends in user satisfaction, and pinpoint where agent
+  performance can be improved.
+id: 9b108896-984c-474d-a751-f886d4fb0687
+name: Agent Response Feedback
+schemas: []
+source: sema4ai
+tables:
+- base_table:
+    data_connection_engine: postgres
+    data_connection_name: agent-feedback-neon
+    kind: db
+    table: agent_feedback
+  description: Stores explicit user feedback on agent responses, including the rated
+    message, surrounding conversation context, and feedback metadata for quality monitoring
+    and analysis.
+  dimensions:
+  - data_type: uuid
+    description: Unique identifier for the feedback entry.
+    expr: id
+    name: id
+    synonyms:
+    - feedback record id
+    - rating entry uuid
+    - feedback key
+  - data_type: text
+    description: Identifier of the tenant/workspace that owns the feedback record.
+    expr: tenant_id
+    name: tenant_id
+    synonyms:
+    - workspace id
+    - organization tenant key
+    - account partition id
+  - data_type: text
+    description: Identifier of the agent (assistant/bot configuration) that produced
+      the rated response.
+    expr: agent_id
+    name: agent_id
+    synonyms:
+    - assistant identifier
+    - bot id
+    - model agent key
+  - data_type: text
+    description: Identifier of the conversation thread containing the rated message.
+    expr: thread_id
+    name: thread_id
+    synonyms:
+    - conversation id
+    - chat thread key
+    - dialog session identifier
+  - data_type: text
+    description: Identifier of the specific message that received the rating.
+    expr: rated_message_id
+    name: rated_message_id
+    synonyms:
+    - scored message key
+    - evaluated response id
+    - rated reply identifier
+  - data_type: text
+    description: Categorical feedback sentiment value indicating positive or negative
+      rating (e.g., thumbs up/down).
+    expr: thumb_up_or_down
+    name: thumb_up_or_down
+    synonyms:
+    - approval vote
+    - like dislike flag
+    - positive negative reaction
+  - data_type: text
+    description: Free-text comments provided with the feedback.
+    expr: notes
+    name: notes
+    synonyms:
+    - review comments
+    - user annotation text
+    - feedback remarks
+  - data_type: text
+    description: The exact agent message that the user rated.
+    expr: rated_agent_message
+    name: rated_agent_message
+    synonyms:
+    - evaluated assistant reply
+    - scored bot response text
+    - rated output content
+  - data_type: text
+    description: User message immediately preceding the rated agent response.
+    expr: preceding_user_message
+    name: preceding_user_message
+    synonyms:
+    - prior user prompt
+    - message before response
+    - previous customer utterance
+  - data_type: jsonb
+    description: JSON array/object containing references to files associated with
+      the interaction or feedback context.
+    expr: input_file_refs
+    name: input_file_refs
+    synonyms:
+    - attached file references
+    - context document links
+    - uploaded file pointers
+  - data_type: text
+    description: URL indicating the origin or location associated with the feedback
+      event.
+    expr: source_url
+    name: source_url
+    synonyms:
+    - feedback origin link
+    - event source address
+    - reference webpage url
+  name: agent_feedback
+  synonyms:
+  - agent ratings log
+  - assistant response feedback
+  - conversation quality feedback
+  time_dimensions:
+  - data_type: timestamp with time zone
+    description: Timestamp when the feedback record was created.
+    expr: created_at
+    name: created_at
+    synonyms:
+    - feedback submitted time
+    - rating timestamp
+    - record creation datetime
