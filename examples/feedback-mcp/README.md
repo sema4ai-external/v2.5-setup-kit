@@ -3,6 +3,9 @@
 A solution template for capturing **trackable thumbs up/down feedback inside a
 Sema4.ai agent run**, with **zero platform changes**.
 
+> **Standing this up?** Follow [SETUP.md](SETUP.md) — the ordered end-to-end
+> runbook (database → data connection → MCP → agents → SDMs).
+
 Unlike the [SharePoint worked migration](../worked-migration/), this is not a
 migrated action pack — it's a from-scratch reference MCP that demonstrates two
 patterns the guide cares about:
