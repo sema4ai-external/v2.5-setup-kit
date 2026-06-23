@@ -30,7 +30,7 @@ Use the thread-files overlay: `sema4ai-api-client` plus the
 
 ## What about cold starts on serverless platforms?
 
-Cloud Run, AgentCore, and Container Apps all cold-start in the
+Cloud Run, Fargate, and Container Apps all cold-start in the
 hundreds-of-ms range. For latency-sensitive MCPs, set min-instances
 to 1. For background-use MCPs, tolerate it.
 

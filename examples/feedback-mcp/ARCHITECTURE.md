@@ -20,7 +20,7 @@ flowchart TD
     OT["OTel / Langsmith spans"]
   end
 
-  subgraph MCPS["Feedback MCP — remote (Cloud Run / Bedrock / ACA)"]
+  subgraph MCPS["Feedback MCP — remote (Cloud Run / Fargate / ACA)"]
     T1["give_thumbs_up / give_thumbs_down"]
     T2["add_feedback_reason"]
     RES["resolve Postgres conn from data connection<br/>(callback token)"]

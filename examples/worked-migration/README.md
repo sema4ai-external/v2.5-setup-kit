@@ -280,5 +280,5 @@ step 5).
 
 - [Sema4.ai patterns](../../docs/05-sema4-patterns.md) — context headers,
   auth, thread files in depth.
-- [Orchestration](../../docs/07-orchestration/) — Cloud Run, Bedrock
-  AgentCore, Azure Container Apps, multi-MCP gateway.
+- [Orchestration](../../docs/07-orchestration/) — Cloud Run, AWS ECS
+  Fargate, Azure Container Apps, multi-MCP gateway.

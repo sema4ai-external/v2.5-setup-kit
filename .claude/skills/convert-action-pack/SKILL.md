@@ -37,8 +37,8 @@ output must be a remote-capable server.
 - **Pack path** — e.g. `./gallery/actions/microsoft-sharepoint/`.
 - **Target directory** — default is `{pack_name}-mcp/` adjacent to the
   pack; ask if they want something else.
-- **Deployment target** (optional at this stage) — Cloud Run, Bedrock
-  AgentCore, Azure Container Apps, or multi-MCP gateway. Doesn't change
+- **Deployment target** (optional at this stage) — Cloud Run, AWS ECS
+  Fargate, Azure Container Apps, or multi-MCP gateway. Doesn't change
   the scaffold, but tells you which ingress conventions to mention later.
 
 If the pack path is ambiguous (monorepo with many packs), ask.

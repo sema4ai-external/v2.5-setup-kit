@@ -1,25 +1,50 @@
 # Orchestration
 
-How to host your migrated MCP. Three cloud-specific walk-throughs plus
-a pattern for bundling multiple MCPs behind one endpoint.
+How to host your migrated MCP. Sema4.ai doesn't host custom MCPs for
+you — you run them on your own infrastructure and register each
+server's URL on an agent.
 
-| Target | Best for | File |
-| --- | --- | --- |
-| **Google Cloud Run** | Teams already on GCP; simplest setup. | [cloud-run.md](cloud-run.md) |
-| **AWS Bedrock AgentCore** | AWS-first stacks, especially integrating with Bedrock-hosted models. | [bedrock-agentcore.md](bedrock-agentcore.md) |
-| **Azure Container Apps** | Azure-first stacks. | [azure-container-apps.md](azure-container-apps.md) |
-| **Multi-MCP gateway** | Hosting several migrated MCPs behind one URL. | [gallery-pattern.md](gallery-pattern.md) |
+The per-platform walkthroughs live in the public docs and are the
+source of truth — they're versioned and kept current there:
 
-Pick one. The MCP itself is the same in every case — what differs is
-the container image's base, ingress config, and how secrets arrive.
+**→ [sema4.ai/docs/v2/setup/mcp-orchestration](https://sema4.ai/docs/v2/setup/mcp-orchestration)**
 
-Every target needs:
+Recommended hosting targets, each with its own walkthrough:
 
-- **Streamable-HTTP transport** (remote-only — Sema4.ai doesn't
-  support stdio).
-- **Session affinity** on the load balancer (MCP sessions are
-  stateful per connection).
-- **Secrets wiring** — platform-native secret managers for anything
-  your MCP reads via `os.environ`.
-- **A health endpoint** if the platform expects one (all three below
-  do).
+| Target | Best for |
+| --- | --- |
+| **Google Cloud Run** | Teams already on GCP; the simplest setup. |
+| **AWS ECS Fargate** | AWS-first stacks wanting a long-running container behind an ALB. |
+| **Azure Container Apps** | Azure-first stacks. |
+
+Hosting several custom MCPs? The public docs also cover the **multi-MCP
+gateway pattern** — one nginx container routing by path prefix to
+several MCP processes, each still registered independently on the
+agent.
+
+## What every target needs
+
+The MCP itself is the same in every case — what differs is the
+container image's base, how ingress is configured, and how secrets
+arrive. Whatever you host on, the deployment must provide:
+
+- **Streamable-HTTP transport** — Sema4.ai connects to remote MCPs over
+  HTTP only; `stdio` is not supported. The endpoint is served at the
+  `/mcp` path, so the URL you register always ends in `/mcp`.
+- **Session affinity (sticky sessions)** on the load balancer or
+  ingress — MCP sessions are stateful per connection. Without affinity,
+  requests get balanced across instances and sessions break.
+- **Secrets wiring** — inject anything your MCP reads via `os.environ`
+  using the platform's native secret manager.
+- **A health endpoint** if the platform expects one (all targets do).
+- **Network line of sight** — the Sema4.ai platform must be able to
+  reach the MCP's URL. On private ingress (internal ALB, private
+  subnets, internal-only Cloud Run), make sure the platform's network
+  can route to it and that firewall / security-group / NSG rules allow
+  the connection.
+
+For the Sema4.ai-specific wiring your MCP must do regardless of host —
+the `X-Tool-Invocation-Context` header and auth forwarding — see
+[sema4-patterns](../05-sema4-patterns.md). To register the deployed URL
+on an agent, see
+[registering with a Sema4.ai agent](../03-framework-and-setup.md#registering-with-a-sema4ai-agent).
