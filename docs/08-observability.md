@@ -9,7 +9,7 @@ MCP code should do to play well with it.
 | Target | Logs | Traces |
 | --- | --- | --- |
 | **Google Cloud Run** | Cloud Logging — captures container stdout automatically. | Cloud Trace — instrument with OpenTelemetry. |
-| **AWS Bedrock AgentCore** | CloudWatch Logs — captures stdout automatically. | AWS X-Ray — instrument with OpenTelemetry or the X-Ray SDK. |
+| **AWS ECS Fargate** | CloudWatch Logs — `awslogs` driver captures stdout. | AWS X-Ray — instrument with OpenTelemetry or the X-Ray SDK. |
 | **Azure Container Apps** | Log Analytics workspace attached to the Container Apps environment. | Application Insights — instrument with OpenTelemetry. |
 
 Every platform handles log retention, search, and alerting out of the

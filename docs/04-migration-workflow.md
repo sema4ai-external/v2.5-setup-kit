@@ -160,13 +160,11 @@ ngrok tunnel URL stays the same across server restarts.
 
 ## Step 6 — Deploy
 
-Pick one:
-
-- [Cloud Run](07-orchestration/cloud-run.md)
-- [Bedrock AgentCore](07-orchestration/bedrock-agentcore.md)
-- [Azure Container Apps](07-orchestration/azure-container-apps.md)
-- [Multi-MCP gateway](07-orchestration/gallery-pattern.md) — bundle several
-  migrated MCPs behind one endpoint.
+Pick a hosting target — Cloud Run, AWS ECS Fargate, Azure Container
+Apps, or the multi-MCP gateway pattern. See
+[orchestration](07-orchestration/) for what every target needs, and the
+[public deployment walkthroughs](https://sema4.ai/docs/v2/setup/mcp-orchestration)
+for the per-platform steps.
 
 Once deployed, re-register the production URL on the Sema4.ai agent,
 retire the ngrok URL, and retire the legacy action pack in Control Room.

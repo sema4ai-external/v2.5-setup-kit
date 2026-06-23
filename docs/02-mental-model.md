@@ -94,4 +94,4 @@ API — let the vendor own it. See the [decision tree](01-decide.md).
 | `sema4ai.actions.chat.*` file APIs   | `sema4ai-api-client` + request-bound context vars                 |
 | `X-Action-Invocation-Context` header | `X-Tool-Invocation-Context` (same format, new name)               |
 | `package.yaml`                       | `pyproject.toml`                                                  |
-| Action Server runtime                | Your deployment — Cloud Run, Bedrock AgentCore, Azure Container Apps, … |
+| Action Server runtime                | Your deployment — Cloud Run, AWS ECS Fargate, Azure Container Apps, … |
