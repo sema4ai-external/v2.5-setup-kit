@@ -52,6 +52,19 @@ Bundled packs typically live under an `actions/` tree
 (`actions/<publisher>/<pack>/<version>/`), but don't assume the layout —
 find every `package.yaml`.
 
+**When the export doesn't cooperate — stop; don't emit a hollow plan:**
+
+- **Zip won't unpack, or it isn't a valid agent export** (not a zip, no
+  runbook/agent spec, no `actions/` tree) → say so and stop. A plan built
+  from nothing is worse than no plan.
+- **No `package.yaml` anywhere** → there are no action packs to migrate.
+  Report that and stop, rather than emitting an empty inventory.
+- **A pack with zero `@action`/`@query` functions** → list it, mark it
+  `drop` (nothing to migrate), and continue with the rest.
+- **Run model undetermined** (no clear conversational/worker signal) → flag
+  it as undetermined and ask the customer to confirm; don't silently assume
+  one, since it drives the auth-mode recommendation (§7).
+
 ## 3. Decide per pack (four outcomes, in order)
 
 Run this decision for **each** pack, in order. Stop at the first match.
